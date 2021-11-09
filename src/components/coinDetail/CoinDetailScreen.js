@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, Image, StyleSheet, SectionList } from 'react-native'
+import { View, Text, Image, StyleSheet, SectionList, FlatList, ActivityIndicator } from 'react-native'
 import colors from '../../res/colors'
+import Http from '../../libs/http'
+import { CoinMarketItem } from './CoinMarketItem'
 
 export const CoinDetailScreen = (props) => {
 
     const [coin, setCoin] = useState({})
+    const [market, setMarket] = useState([])
+    const [loading, setLoading] = useState(false)
 
     const getSymbolIcon = (name) => {
 
         if (name) {
             const symbol = name.toLowerCase()
-            console.log(symbol)
             return `https://www.coinlore.com/img/25x25/${symbol}.png`
         }
     }
@@ -33,14 +36,21 @@ export const CoinDetailScreen = (props) => {
         return sections
     }
 
+    const getMarkets = async (coinId) => {
+        const url = `https://api.coinlore.net/api/coin/markets/?id=${coinId}`
+        const markets = await Http.instance.get(url)
+        setMarket(markets)
+    }
+
     useEffect(() => {
         const { coin } = props.route.params
 
         props.navigation.setOptions({ title: coin.symbol })
         setCoin(coin)
-    })
 
-    console.log(coin)
+        getMarkets(coin.id)
+    }, [])
+
     return (
         <View style={styles.container}>
             <View style={styles.subHeader}>
@@ -51,6 +61,7 @@ export const CoinDetailScreen = (props) => {
                 <Text style={styles.titleText}>{coin.name}</Text>
             </View>
             <SectionList
+                style={styles.section}
                 sections={getSections(coin)}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) =>
@@ -64,6 +75,19 @@ export const CoinDetailScreen = (props) => {
                     </View>
                 }
             />
+            <View style={styles.sectionHeader}>
+                <Text style={styles.sectionText} >Markets</Text>
+            </View>
+
+
+            <FlatList
+                style={styles.list}
+                horizontal={true}
+                data={market}
+                renderItem={({ item }) => <CoinMarketItem item={item} />}
+            />
+
+
         </View>
     )
 }
@@ -88,6 +112,13 @@ const styles = StyleSheet.create({
     iconImg: {
         width: 25,
         height: 25
+    },
+    section: {
+        maxHeight: 220
+    },
+    list: {
+        maxHeight: 100,
+        paddingLeft: 16
     },
     sectionHeader: {
         backgroundColor: 'rgba(0,0,0, 0.2)',
