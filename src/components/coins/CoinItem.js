@@ -6,9 +6,9 @@ export const CoinItem = ({ item, onPress }) => {
 
     const getImgArrow = () => {
         if (item.percent_change_1h > 0) {
-            return require('../../assets/arrow_up.png')
+            return require('../../assets/rn_assets/arrow_up.png')
         } else {
-            return require('../../assets/arrow_down.png')
+            return require('../../assets/rn_assets/arrow_down.png')
         }
     }
 

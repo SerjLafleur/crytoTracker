@@ -51,6 +51,8 @@ export const CoinDetailScreen = (props) => {
         getMarkets(coin.id)
     }, [])
 
+    console.log(market)
+
     return (
         <View style={styles.container}>
             <View style={styles.subHeader}>
